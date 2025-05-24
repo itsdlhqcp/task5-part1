@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvYTAxMC1tYXJrdXNzcGlza2UtZmViMTktbXNwXzA3MDlfODg4Ny5qcGc.jpg" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    /* body section is here */
+    body {
+      background-color: #0a0a0a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    /* Header Styles */
+    .site-header {
+      width: 100%;
+      background-color: #0a0a0a;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .header-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+    }
+    
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      color: #fff;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .camera-button, .menu-button {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50px;
+      color: #fff;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .camera-button:hover, .menu-button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Mobile adjustments for header */
+    @media (max-width: 768px) {
+      .header-content {
+        padding: 0 1.5rem;
+      }
+      
+      .logo {
+        display: none;
+      }
+      
+      .controls {
+        gap: 0.8rem;
+      }
+      
+      .camera-button, .menu-button {
+        padding: 0.4rem 1.2rem;
+        font-size: 0.8rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .site-header {
+        padding: 0.8rem 0;
+      }
+      
+      .header-content {
+        padding: 0 1rem;
+      }
+      
+      .header-content p {
+        font-size: 0.9rem;
+      }
+      
+      .logo {
+        font-size: 1.3rem;
+      }
+      
+      .controls {
+        gap: 0.6rem;
+      }
+      
+      .camera-button, .menu-button {
+        padding: 0.3rem 1rem;
+        font-size: 0.75rem;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      .header-content {
+        padding: 0 0.8rem;
+      }
+      
+      .header-content p {
+        font-size: 0.8rem;
+      }
+      
+      .logo {
+        font-size: 1.1rem;
+      }
+      
+      .controls {
+        gap: 0.5rem;
+      }
+      
+      .camera-button, .menu-button {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.7rem;
+      }
+    }
+    
+    /* Gallery Container */
+    .gallery-container {
+      display: flex;
+      position: relative;
+      width: 100%;
+      padding: 0 2rem;
+      min-height: calc(100vh - 200px);
+      overflow-x: hidden;
+    }
+    
+    .gallery {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 2rem 0;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .img-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      cursor: pointer;
+      margin-bottom: 2rem;
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), z-index 0.01s, opacity 0.8s ease;
+      z-index: 1;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    
+    .img-container.animate-from-left {
+      transform: translateX(-10vw);
+    }
+    
+    .img-container.animate-from-right {
+      transform: translateX(10vw);
+    }
+    
+    .img-container.animate-from-top {
+      transform: translateY(-10vh);
+    }
+    
+    .img-container.animate-from-bottom {
+      transform: translateY(10vh);
+    }
+    
+    .img-container.in-view {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+    
+    .img-container.active-image .gallery-img {
+      filter: grayscale(0%);
+    }
+    
+    .img-container:hover {
+      transform: translateY(-10px) scale(1.02);
+      z-index: 20;
+    }
+    
+    .gallery-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: filter 0.5s ease;
+      filter: grayscale(100%);
+    }
+    
+    .img-container:hover .gallery-img {
+      filter: grayscale(0%);
+    }
+    
+    /* Sidebar with thumbnails */
+    .thumbnail-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      padding-left: 1rem;
+      padding-bottom: 2rem;
+      height: calc(100vh - 200px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+      position: fixed;
+      top: 100px;
+      right: 2rem;
+      z-index: 100;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .thumbnail-sidebar.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .thumbnail-sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    .thumbnail-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .thumbnail-sidebar::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+    }
+    
+    .thumbnail {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s ease, transform 0.2s ease;
+      border: 2px solid transparent;
+    }
+    
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .thumbnail:hover {
+      opacity: 1;
+      transform: translateX(-3px);
+    }
+    
+    .thumbnail.active {
+      opacity: 1;
+      border-color: #fff;
+      transform: translateX(-5px);
+    }
+
+    /* 3D Carousel Section */
+    .carousel-section {
+      width: 100%;
+      background-color: #0a0a0a;
+      padding: 4rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    /* Mobile adjustments for carousel section */
+    @media (max-width: 768px) {
+      .carousel-section {
+        padding: 1rem 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .carousel-section {
+        padding: 0.5rem 0;
+      }
+    }
+
+    .carousel-section .stage, .carousel-section .ring, .carousel-section .img {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      user-select: none;
+    }
+
+    .carousel-section .stage {
+      overflow: hidden;
+      background: transparent;
+      height: 500px;
+      position: relative;
+    }
+
+    .carousel-section div, .carousel-section svg {
+      position: absolute;
+    }
+
+    .carousel-section .container {
+      perspective: 2000px;
+      width: 300px;
+      height: 400px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* Header Styles */
+    .site-header {
+      width: 100%;
+      background-color: #0a0a0a;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .header-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+    }
+    
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      color: #fff;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .camera-button, .menu-button {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50px;
+      color: #fff;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .camera-button:hover, .menu-button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Mobile adjustments for header */
+    @media (max-width: 768px) {
+      .header-content {
+        padding: 0 1.5rem;
+      }
+      
+      .logo {
+        font-size: 1.5rem;
+      }
+      
+      .controls {
+        gap: 0.8rem;
+      }
+      
+      .camera-button, .menu-button {
+        padding: 0.4rem 1.2rem;
+        font-size: 0.8rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .site-header {
+        padding: 0.8rem 0;
+      }
+      
+      .header-content {
+        padding: 0 1rem;
+      }
+      
+      .header-content p {
+        font-size: 0.9rem;
+      }
+      
+      .logo {
+        font-size: 1.3rem;
+      }
+      
+      .controls {
+        gap: 0.6rem;
+      }
+      
+      .camera-button, .menu-button {
+        padding: 0.3rem 1rem;
+        font-size: 0.75rem;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      .header-content {
+        padding: 0 0.8rem;
+      }
+      
+      .header-content p {
+        font-size: 0.8rem;
+      }
+      
+      .logo {
+        font-size: 1.1rem;
+      }
+      
+      .controls {
+        gap: 0.5rem;
+      }
+      
+      .camera-button, .menu-button {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.7rem;
+      }
+    }
+    
+    /* Footer Styles */
+    .site-footer {
+      width: 100%;
+      background-color: #0a0a0a;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+    
+    .footer-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1rem 0;
+    }
+    
+    .footer-links a {
+      color: #999;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-links a:hover {
+      color: #fff;
+    }
+    
+    .copyright {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+    
+    /* Mobile adjustments for footer */
+    @media (max-width: 768px) {
+      .site-footer {
+        padding: 1.5rem 0;
+        margin-top: 2rem;
+      }
+      
+      .footer-content {
+        padding: 0 1.5rem;
+      }
+      
+      .footer-content h2 {
+        font-size: 1.3rem;
+      }
+      
+      .footer-links {
+        gap: 1.5rem;
+      }
+      
+      .footer-links a {
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .site-footer {
+        padding: 1rem 0;
+        margin-top: 1.5rem;
+      }
+      
+      .footer-content {
+        padding: 0 1rem;
+      }
+      
+      .footer-content h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 0.8rem;
+        margin: 0.8rem 0;
+      }
+      
+      .footer-links a {
+        font-size: 0.85rem;
+      }
+      
+      .copyright {
+        font-size: 0.8rem;
+        margin-top: 0.8rem;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      .footer-content {
+        padding: 0 0.8rem;
+      }
+      
+      .footer-content h2 {
+        font-size: 1.1rem;
+      }
+      
+      .footer-links a {
+        font-size: 0.8rem;
+      }
+      
+      .copyright {
+        font-size: 0.75rem;
+        line-height: 1.4;
+      }
+    }
+    
+    /* Media Queries */
+    @media (min-width: 768px) {
+      .gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .gallery {
+        max-width: 90%;
+        margin-right: 120px;
+      }
+      
+      .img-container {
+        margin-bottom: -2rem;
+      }
+      
+      .img-container:nth-child(3n+1) {
+        align-self: flex-start;
+        margin-right: auto;
+        margin-left: 0;
+        z-index: 3;
+      }
+      
+      .img-container:nth-child(3n+2) {
+        align-self: flex-end;
+        margin-left: auto;
+        margin-right: 0;
+        margin-top: -2rem;
+        z-index: 2;
+      }
+      
+      .img-container:nth-child(3n+3) {
+        align-self: center;
+        margin-top: -2rem;
+        z-index: 1;
+      }
+      
+      .img-container.in-view:hover {
+        transform: translateY(-10px);
+      }
+    }
+    
+    @media (min-width: 1280px) {
+      .gallery {
+        max-width: 85%;
+      }
+      
+      .img-container {
+        margin-bottom: -4rem;
+      }
+      
+      .img-container:nth-child(3n+2) {
+        margin-top: -6rem;
+      }
+      
+      .img-container:nth-child(3n+3) {
+        margin-top: -3rem;
+      }
+      
+      .thumbnail {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .thumbnail-sidebar {
+        right: 3rem;
+      }
+    }
+    
+    @media (min-width: 1600px) {
+      .gallery {
+        max-width: 80%;
+      }
+      
+      .img-container {
+        margin-bottom: -6rem;
+      }
+      
+      .img-container:nth-child(3n+2) {
+        margin-top: -8rem;
+      }
+      
+      .img-container:nth-child(3n+3) {
+        margin-top: -4rem;
+      }
+    }
+    
+    /* Animation delay for sequential loading */
+    .img-container:nth-child(1) { transition-delay: 0.1s; }
+    .img-container:nth-child(2) { transition-delay: 0.2s; }
+    .img-container:nth-child(3) { transition-delay: 0.3s; }
+    .img-container:nth-child(4) { transition-delay: 0.4s; }
+    .img-container:nth-child(5) { transition-delay: 0.5s; }
+    .img-container:nth-child(6) { transition-delay: 0.6s; }
+    .img-container:nth-child(7) { transition-delay: 0.7s; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <p>PlotTwist</p>
+      <div class="logo">Image Gallery</div>
+      <div class="controls">
+        <button class="menu-button">DOWNLOAD APP</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section 1: Gallery Content -->
+  <section class="gallery-container">
+    <div class="gallery">
+      <div class="img-container" id="img1">
+        <img src="image/1.jpg" alt="Landscape photograph" class="gallery-img" />
+      </div>
+      <div class="img-container" id="img2">
+        <img src="image/2.jpg" alt="Nature photograph" class="gallery-img" />
+      </div>
+      <div class="img-container featured" id="img3">
+        <img src="image/3.jpg" alt="Mountain landscape" class="gallery-img" />
+      </div>
+      <div class="img-container" id="img4">
+        <img src="image/4.jpg" alt="Scenic view" class="gallery-img" />
+      </div>
+      <div class="img-container" id="img5">
+        <img src="image/5.jpg" alt="Coastal view" class="gallery-img" />
+      </div>
+      <div class="img-container" id="img6">
+        <img src="image/6.jpg" alt="Coastal view" class="gallery-img" />
+      </div>
+      <div class="img-container" id="img7">
+        <img src="image/7.jpg" alt="Coastal view" class="gallery-img" />
+      </div>
+    </div>
+
+    <div class="thumbnail-sidebar">
+      <div class="thumbnail" data-target="img1">
+        <img src="image/1.jpg" alt="Thumbnail" />
+      </div>
+      <div class="thumbnail" data-target="img2">
+        <img src="image/2.jpg" alt="Thumbnail" />
+      </div>
+      <div class="thumbnail active" data-target="img3">
+        <img src="image/3.jpg" alt="Thumbnail" />
+      </div>
+      <div class="thumbnail active" data-target="img4">
+        <img src="image/4.jpg" alt="Thumbnail" />
+      </div>
+      <div class="thumbnail active" data-target="img5">
+        <img src="image/5.jpg" alt="Thumbnail" />
+      </div>
+      <div class="thumbnail active" data-target="img6">
+        <img src="image/6.jpg" alt="Thumbnail" />
+      </div>
+      <div class="thumbnail active" data-target="img7">
+        <img src="image/7.jpg" alt="Thumbnail" />
+      </div>
+    </div>
+  </section>
+  
+  <!-- Section 2: 3D Carousel Content -->
+  <section class="carousel-section">
+    <div class="stage">
+      <div class="container">
+        <div class="ring">
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+          <div class="img"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <footer class="site-footer">
+    <div class="footer-content">
+      <h2>FOOTER</h2>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact</a>
+      </div>
+      <p class="copyright">© 2025 DLHQ Photography. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.0/gsap.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Original gallery functionality
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const imgContainers = document.querySelectorAll('.img-container');
+        const thumbnailSidebar = document.querySelector('.thumbnail-sidebar');
+        const galleryContainer = document.querySelector('.gallery-container');
+        const imagePositions = {};
+        let isScrollingProgrammatically = false;
+      
+        function isGalleryInViewport() {
+          const galleryRect = galleryContainer.getBoundingClientRect();
+          const carouselSection = document.querySelector('.carousel-section');
+          const carouselRect = carouselSection.getBoundingClientRect();
+          const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+          
+          if (carouselRect.top <= windowHeight && carouselRect.bottom >= 0) {
+            return false;
+          }
+          
+          if (galleryRect.top > windowHeight * 0.5) {
+            return false;
+          }
+          
+          if (galleryRect.bottom < 0) {
+            return false;
+          }
+          
+          return galleryRect.bottom > windowHeight * 0.1;
+        }
+      
+        function toggleSidebarVisibility() {
+          if (isGalleryInViewport()) {
+            thumbnailSidebar.classList.remove('hidden');
+          } else {
+            thumbnailSidebar.classList.add('hidden');
+          }
+        }
+      
+        function scrollToImage(targetId) {
+          isScrollingProgrammatically = true;
+          
+          imgContainers.forEach(container => {
+            container.style.display = 'block';
+          });
+          
+          const targetElement = document.getElementById(targetId);
+          if (targetElement) {
+            const rect = targetElement.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const targetTop = rect.top + scrollTop;
+            
+            let offset;
+            if (window.innerWidth < 768) {
+              offset = 230;
+            } else if (window.innerWidth < 1024) {
+              offset = 100;
+            } else {
+              offset = 90;
+            }
+            
+            window.scrollTo({
+              top: targetTop - offset,
+              behavior: 'smooth'
+            });
+            
+            setTimeout(() => {
+              isScrollingProgrammatically = false;
+            }, 1000);
+          }
+          
+          updateActiveThumbnail(targetId);
+        }
+        
+        function updateActiveThumbnail(targetId) {
+          thumbnails.forEach(thumb => {
+            thumb.classList.remove('active');
+            if (thumb.getAttribute('data-target') === targetId) {
+              thumb.classList.add('active');
+            }
+          });
+          
+          imgContainers.forEach(container => {
+            container.classList.remove('active-image');
+            if (container.id === targetId) {
+              container.classList.add('active-image');
+            }
+          });
+        }
+        
+        function calculateImagePositions() {
+          imgContainers.forEach(container => {
+            const rect = container.getBoundingClientRect();
+            imagePositions[container.id] = {
+              top: rect.top + window.scrollY,
+              bottom: rect.bottom + window.scrollY
+            };
+          });
+        }
+        
+        function handleScroll() {
+          toggleSidebarVisibility();
+          
+          if (isScrollingProgrammatically) {
+            return;
+          }
+          
+          const scrollPosition = window.scrollY + window.innerHeight * 0.7;
+          
+          let currentImageId = null;
+          let closestDistance = Infinity;
+          
+          for (const id in imagePositions) {
+            const pos = imagePositions[id];
+            const middle = (pos.top + pos.bottom) / 2;
+            const distance = Math.abs(scrollPosition - middle);
+            
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              currentImageId = id;
+            }
+          }
+          
+          if (currentImageId) {
+            updateActiveThumbnail(currentImageId);
+          }
+          
+          checkElementsInViewport();
+        }
+        
+        function isElementInViewport(el) {
+          const rect = el.getBoundingClientRect();
+          return (
+            rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85 &&
+            rect.bottom >= 0
+          );
+        }
+        
+        function checkElementsInViewport() {
+          imgContainers.forEach(container => {
+            if (isElementInViewport(container) && !container.classList.contains('in-view')) {
+              container.classList.add('in-view');
+            }
+          });
+        }
+        
+        function setupAnimations() {
+          imgContainers.forEach((container, index) => {
+            container.classList.remove('animate-from-left', 'animate-from-right', 'animate-from-top', 'animate-from-bottom', 'in-view');
+            
+            if (index % 3 === 0) {
+              container.classList.add('animate-from-left');
+            } else if (index % 3 === 1) {
+              container.classList.add('animate-from-right');
+            } else {
+              container.classList.add(index % 2 === 0 ? 'animate-from-top' : 'animate-from-bottom');
+            }
+            
+            if (index % 3 === 0) {
+              container.style.zIndex = '3';
+            } else if (index % 3 === 1) {
+              container.style.zIndex = '2';
+            } else {
+              container.style.zIndex = '1';
+            }
+          });
+          
+          void document.documentElement.offsetHeight;
+          setTimeout(checkElementsInViewport, 100);
+        }
+        
+        thumbnails.forEach(thumbnail => {
+          thumbnail.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const targetId = this.getAttribute('data-target');
+            setupAnimations();
+            
+            setTimeout(() => {
+              scrollToImage(targetId);
+            }, 100);
+          });
+        });
+        
+        imgContainers.forEach(container => {
+          container.addEventListener('mouseenter', function() {
+            this.style.zIndex = '20';
+          });
+          
+          container.addEventListener('mouseleave', function() {
+            const index = Array.from(imgContainers).indexOf(this);
+            if (index % 3 === 0) {
+              this.style.zIndex = '3';
+            } else if (index % 3 === 1) {
+              this.style.zIndex = '2';
+            } else {
+              this.style.zIndex = '1';
+            }
+          });
+        });
+        
+        imgContainers.forEach(container => {
+          container.style.display = 'block';
+        });
+        
+        updateActiveThumbnail('img3');
+        
+        function animateImagesOnLoad() {
+          setupAnimations();
+          calculateImagePositions();
+          
+          setTimeout(() => {
+            checkElementsInViewport();
+          }, 300);
+        }
+        
+        window.addEventListener('load', function() {
+          animateImagesOnLoad();
+          toggleSidebarVisibility();
+          window.addEventListener('scroll', handleScroll);
+        });
+        
+        window.addEventListener('resize', function() {
+          calculateImagePositions();
+          toggleSidebarVisibility();
+          
+          const width = window.innerWidth;
+          if (Math.abs(lastWidth - width) > 200) {
+            setupAnimations();
+            lastWidth = width;
+          }
+        });
+        
+        let lastWidth = window.innerWidth;
+        setupAnimations();
+        setTimeout(checkElementsInViewport, 500);
+        setTimeout(toggleSidebarVisibility, 100);
+
+        // 3D Carousel functionality
+        let xPos = 0;
+
+        gsap.timeline()
+            .set('.ring', { rotationY: 180, cursor: 'grab' })
+            .set('.img', {
+                rotateY: (i) => i * -36,
+                transformOrigin: '50% 50% 500px',
+                z: -500,
+                backgroundImage: (i) => 'url(' + getImageUrl(i) + ')',
+                backgroundPosition: (i) => getBgPos(i),
+                backfaceVisibility: 'hidden'
+            })
+            .from('.img', {
+                duration: 1.5,
+                y: 200,
+                opacity: 0,
+                stagger: 0.1,
+                ease: 'expo'
+            })
+            .add(() => {
+                document.querySelectorAll('.img').forEach(img => {
+                    img.addEventListener('mouseenter', (e) => {
+                        let current = e.currentTarget;
+                        gsap.to('.img', { opacity: (i, t) => (t == current) ? 1 : 0.5, ease: 'power3' })
+                    });
+
+                    img.addEventListener('mouseleave', (e) => {
+                        gsap.to('.img', { opacity: 1, ease: 'power2.inOut' })
+                    });
+                });
+            }, '-=0.5');
+
+        document.addEventListener('mousedown', dragStart);
+        document.addEventListener('touchstart', dragStart);
+
+        function dragStart(e) {
+            if (e.touches) e.clientX = e.touches[0].clientX;
+            xPos = Math.round(e.clientX);
+            gsap.set('.ring', { cursor: 'grabbing' });
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag);
+        }
+
+        function drag(e) {
+            if (e.touches) e.clientX = e.touches[0].clientX;
+            gsap.to('.ring', {
+                rotationY: '-=' + ((Math.round(e.clientX) - xPos) % 360),
+                onUpdate: () => { gsap.set('.img', { backgroundPosition: (i) => getBgPos(i) }) }
+            });
+
+            xPos = Math.round(e.clientX);
+        }
+
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchend', dragEnd);
+
+        function dragEnd(e) {
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            gsap.set('.ring', { cursor: 'grab' });
+        }
+
+        function getBgPos(i) {
+            return (100 - gsap.utils.wrap(0, 360, gsap.getProperty('.ring', 'rotationY') - 180 - i * 36) / 360 * 500) + 'px 0px';
+        }
+
+        function getImageUrl(i) {
+            const imageUrls = [
+            'https://picsum.photos/id/42/600/400/',
+            'https://picsum.photos/id/43/600/400/',
+            'https://picsum.photos/id/44/600/400/',
+            'https://picsum.photos/id/45/600/400/',
+            'https://picsum.photos/id/46/600/400/',
+            'https://picsum.photos/id/47/600/400/',
+            'https://picsum.photos/id/48/600/400/',
+            'https://picsum.photos/id/49/600/400/',
+            'https://picsum.photos/id/50/600/400/',
+            'https://picsum.photos/id/51/600/400/'
+            ];
+            return imageUrls[i];
+        }
+    });
+  </script>
+</body>
+</html>
